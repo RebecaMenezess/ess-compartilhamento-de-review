@@ -1,59 +1,53 @@
-import React from "react"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import '../../style/Feed.css'
-const API_BASE = "http://localhost:3001"
+import '../../style/Feed.css';
+const API_BASE = "http://localhost:3001";
 
 const Feed = () => {
-    const [restaurants, setRandomRestaurants] = useState([])
+    const [restaurants, setRandomRestaurants] = useState([]);
     const [reviews, setRandomReviews] = useState([]);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        GetRandomRestaurants()
-            .catch(err => {
+        (async () => {
+            try {
+                const randomRestaurants = await GetRandomRestaurants();
+                setRandomRestaurants(randomRestaurants);
+
+                const randomReviews = await GetRandomReviews();
+                setRandomReviews(randomReviews);
+
+                const mostLikedReviews = await GetMostLikedReviews();
+                setRandomReviews(mostLikedReviews);
+            } catch (err) {
                 console.error("Error: ", err);
                 setError(err.message);
-            });
-
-        GetRandomReviews()
-            .catch(err => {
-                console.error("Error: ", err);
-                setError(err.message);
-            });
-
-        GetMostLikedReviews()
-            .catch(err => {
-                console.error("Error> ", err);
-                setError(err.message);
-            });
-    }, []); 
+            }
+        })();
+    }, []);
 
     const GetRandomRestaurants = async () => {
-        const response = await fetch(API_BASE + "/feed/random_restaurants");
+        const response = await fetch(`${API_BASE}/feed/random_restaurants`);
         if (!response.ok) {
             throw new Error("Failed to fetch");
         }
-        const data = await response.json();
-        setRandomRestaurants(data);
+        return response.json();
     };
 
     const GetMostLikedReviews = async () => {
-        const response = await fetch(API_BASE + "/feed/random_reviews");
+        const response = await fetch(`${API_BASE}/feed/random_reviews`);
         if (!response.ok) {
             throw new Error("Failed to fetch");
         }
-        const data = await response.json();
-        setRandomReviews(data);
+        return response.json();
     };
 
     const GetRandomReviews = async () => {
-        const response = await fetch(API_BASE + "/feed/most_liked_reviews");
+        const response = await fetch(`${API_BASE}/feed/most_liked_reviews`);
         if (!response.ok) {
             throw new Error("Failed to fetch");
         }
-        const data = await response.json();
-        setRandomReviews(data);
+        return response.json();
     };
 
     return (
@@ -61,7 +55,7 @@ const Feed = () => {
             <h1 className="titleFeed">Reviews em Alta</h1>
             {reviews.length === 0 && (
                 <div className="noContentFeed">
-                    <h1 className= "noDataReviewFeed">AINDA NÃO EXISTEM REVIEWS CADASTRADAS NO SITE</h1>
+                    <h1 className="noDataReviewFeed">AINDA NÃO EXISTEM REVIEWS CADASTRADAS NO SITE</h1>
                 </div>
             )}
             {reviews.length > 0 && (
@@ -70,12 +64,12 @@ const Feed = () => {
                         <h2 key={index} className="reviewTitleFeed">{review.title}</h2>
                     ))}
                 </div>
-            )}                               
+            )}
 
             <h1 className="titleFeed">Restaurantes</h1>
             {restaurants.length === 0 && (
                 <div className="noContentFeed">
-                    <h1 className= "noDataRestaurantFeed">AINDA NÃO EXISTEM RESTAURANTES CADASTRADOS NO SITE</h1>
+                    <h1 className="noDataRestaurantFeed">AINDA NÃO EXISTEM RESTAURANTES CADASTRADOS NO SITE</h1>
                 </div>
             )}
             {restaurants.length > 0 && (
@@ -91,7 +85,7 @@ const Feed = () => {
             <h1 className="titleFeed">Reviews</h1>
             {reviews.length === 0 && (
                 <div className="noLastContentFeed">
-                    <h1 className= "noDataReviewFeed">AINDA NÃO EXISTEM REVIEWS CADASTRADAS NO SITE</h1>
+                    <h1 className="noDataReviewFeed">AINDA NÃO EXISTEM REVIEWS CADASTRADAS NO SITE</h1>
                 </div>
             )}
             {reviews.length > 0 && (
@@ -101,8 +95,8 @@ const Feed = () => {
                     ))}
                 </div>
             )}
-    </div>
-)}
-        
+        </div>
+    );
+};
 
-export default Feed
+export default Feed;
