@@ -1,31 +1,34 @@
 const Restaurant = require("../models/Restaurant")
 const Review = require("../models/Review")
 
-// selects 5 random restaurants registered
+// function that fetchs random items from a collection
+const fetch_random_items = async (model, count) => {
+    const items = await model.find();
+    if (items.length === 0) {
+        throw new Error('No items found');
+    }
+    return items.sort(() => Math.random() - 0.5).slice(0, count);
+};
+
+// fetches 5 random restaurants
 const get_random_restaurants = async (req, res) => {
-    const restaurants = await Restaurant.find()
-
-    if (restaurants.length === 0) {
-        return res.status(404).json({ error: 'Ainda não há restaurantes cadastrados' })
+    try {
+        const randomRestaurants = await fetch_random_items(Restaurant, 5);
+        res.json(randomRestaurants);
+    } catch (error) {
+        res.status(404).json({ error: 'Ainda não há restaurantes cadastrados' });
     }
-    else {
-        const random_restaurants = restaurants.sort(() => Math.random() - 0.5).slice(0, 5);
-        res.json(random_restaurants)
-    }
-}
+};
 
-// selects 5  random reviews registered
+// fetches 5 random reviews
 const get_random_reviews = async (req, res) => {
-    const reviews = await Review.find()
-
-    if (reviews.length === 0) {
-        return res.status(404).json({ error: 'Ainda não há reviews cadastradas' })
+    try {
+        const randomReviews = await fetch_random_items(Review, 5);
+        res.json(randomReviews);
+    } catch (error) {
+        res.status(404).json({ error: 'Ainda não há reviews cadastradas' });
     }
-    else {
-        const random_reviews = reviews.sort(() => Math.random() - 0.5).slice(0, 5);
-        res.json(random_reviews)
-    }
-}
+};
 
 // finds the 5 most liked reviews
 const get_most_liked_reviews = async (req, res) => {
@@ -44,4 +47,4 @@ module.exports = {
     get_random_restaurants,
     get_random_reviews,
     get_most_liked_reviews
-}
+};
